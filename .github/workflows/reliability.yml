@@ -1,0 +1,112 @@
+name: reliability
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly. This watches for contract drift on someone else's API; it is not
+    # an uptime monitor, and there is no reason to generate recurring load
+    # against a bootstrapped company's production API.
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    # pipefail matters here: several steps pipe the CLI through `tee` into the job
+    # summary, and without it tee's exit status would mask a failing check.
+    shell: bash -eo pipefail {0}
+
+concurrency:
+  group: reliability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests (python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # pip, not uv: setup-python already provides it, and two runtime
+      # dependencies do not justify adding another action to the graph.
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      # The unit suite mocks every HTTP call, so it never touches Evaboot.
+      - run: pytest -q
+
+  probe:
+    name: live probe
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      # Evaluated once here so the step below can branch on it without putting
+      # the secrets context in an `if`, and without exporting the key to every
+      # other step in the job.
+      HAS_API_KEY: ${{ secrets.EVABOOT_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - name: Fetch current OpenAPI document
+        run: evaboot-probe schema fetch --out schemas/openapi.current.json
+
+      - name: Diff against committed baseline
+        run: |
+          echo "## Contract diff" >> "$GITHUB_STEP_SUMMARY"
+          evaboot-probe schema diff \
+            --current schemas/openapi.current.json \
+            --format markdown | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Reliability checks
+        # push/PR runs are GET-only. The opt-in POST to /trial/* happens on
+        # manual and scheduled runs only. One invocation, so the live API is not
+        # probed twice per run.
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            TRIAL=--include-trial
+          else
+            TRIAL=""
+          fi
+          evaboot-probe check --format json $TRIAL | tee report.json
+          {
+            echo "## Reliability checks"
+            echo '```json'
+            cat report.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate the example webhook payload
+        run: evaboot-probe webhook validate docs/webhook-example.json
+
+      - name: Authenticated checks
+        if: env.HAS_API_KEY == 'true'
+        env:
+          EVABOOT_API_KEY: ${{ secrets.EVABOOT_API_KEY }}
+        # A missing Sales Navigator seat or an exhausted daily quota warns rather
+        # than fails, but a rejected key does fail; keep that out of the required
+        # signal for forks and contributors.
+        continue-on-error: true
+        run: evaboot-probe check --format markdown | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reliability-report
+          path: |
+            report.json
+            schemas/openapi.current.json
+          if-no-files-found: warn

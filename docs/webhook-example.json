@@ -1,0 +1,23 @@
+{
+  "id": "1755561600000x123456789012345678",
+  "status": "complete",
+  "created_at": "2026-08-19T02:15:00Z",
+  "updated_at": "2026-08-19T02:18:42Z",
+  "progress": 100,
+  "error_message": "",
+  "job_type": "email_finder",
+  "prospects": [
+    {
+      "id": "1755561600000x987654321098765432",
+      "first_name": "Ada",
+      "last_name": "Lovelace",
+      "full_name": "Ada Lovelace",
+      "company_name": "Analytical Engines",
+      "company_domain": "example.com",
+      "found_email": "ada@example.com",
+      "email_validity": "valid",
+      "status": "found",
+      "error_message": null
+    }
+  ]
+}

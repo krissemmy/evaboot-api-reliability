@@ -1,0 +1,3423 @@
+{
+  "components": {
+    "schemas": {
+      "AccountAddIn": {
+        "properties": {
+          "company_ids": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "maxItems": 999,
+            "minItems": 1,
+            "title": "Company Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_ids"
+        ],
+        "title": "AccountAddIn",
+        "type": "object"
+      },
+      "EmailFinderIn": {
+        "properties": {
+          "company_domain": {
+            "default": "",
+            "title": "Company Domain",
+            "type": "string"
+          },
+          "company_name": {
+            "default": "",
+            "title": "Company Name",
+            "type": "string"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name"
+        ],
+        "title": "EmailFinderIn",
+        "type": "object"
+      },
+      "EmailFinderJobAcceptedOut": {
+        "description": "POST response — accepted-and-queued. HTTP 202.\n\nMatches legacy ``EmailFinderListCreateView.create`` at\n``evaboot_django/public_api/views/email_finder.py:302-308``.\nBubble's workflow stores ``job_id`` (the Bubble-minted ID) and uses\nit for subsequent GET polling.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "message": {
+            "default": "Email finder job created and processing has begun",
+            "title": "Message",
+            "type": "string"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "EmailFinderJobAcceptedOut",
+        "type": "object"
+      },
+      "EmailFinderJobIn": {
+        "description": "Bulk email-finder job request — matches legacy\n``EmailFinderJobSerializer`` (public_api/serializers/email_finder.py).",
+        "properties": {
+          "job_name": {
+            "default": "",
+            "title": "Job Name",
+            "type": "string"
+          },
+          "prospects": {
+            "items": {
+              "$ref": "#/components/schemas/EmailFinderProspectIn"
+            },
+            "title": "Prospects",
+            "type": "array"
+          },
+          "webhook_url": {
+            "default": "",
+            "title": "Webhook Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prospects"
+        ],
+        "title": "EmailFinderJobIn",
+        "type": "object"
+      },
+      "EmailFinderJobInProgressOut": {
+        "description": "GET response while job is pending or running. HTTP 202 + limited\nfields, matches legacy\n``evaboot_django/public_api/views/email_finder.py:399-406``.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EmailFinderJobInProgressOut",
+        "type": "object"
+      },
+      "EmailFinderJobOut": {
+        "description": "Bulk job response (completed) — matches legacy\n``EmailFinderJobDetailSerializer``. ``id`` is the Bubble-minted\n``bubble_job_id`` (NOT the Django UUID), per legacy behavior at\n``evaboot_django/public_api/views/email_finder.py:410``.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_message": {
+            "default": "",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "job_type": {
+            "default": "email_finder",
+            "title": "Job Type",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "prospects": {
+            "items": {
+              "$ref": "#/components/schemas/EmailFinderProspectOut"
+            },
+            "title": "Prospects",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at",
+          "updated_at",
+          "prospects"
+        ],
+        "title": "EmailFinderJobOut",
+        "type": "object"
+      },
+      "EmailFinderOut": {
+        "description": "Single email-finder response (matches old SingleEmailFinderCreateView).",
+        "properties": {
+          "job_id": {
+            "default": "",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "prospect": {
+            "$ref": "#/components/schemas/EmailFinderProspectOut"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "prospect"
+        ],
+        "title": "EmailFinderOut",
+        "type": "object"
+      },
+      "EmailFinderProspectIn": {
+        "description": "One prospect inside a bulk email-finder job (Bubble's POST shape).",
+        "properties": {
+          "company_domain": {
+            "default": "",
+            "title": "Company Domain",
+            "type": "string"
+          },
+          "company_name": {
+            "default": "",
+            "title": "Company Name",
+            "type": "string"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name"
+        ],
+        "title": "EmailFinderProspectIn",
+        "type": "object"
+      },
+      "EmailFinderProspectOut": {
+        "properties": {
+          "company_domain": {
+            "default": "",
+            "title": "Company Domain",
+            "type": "string"
+          },
+          "company_name": {
+            "default": "",
+            "title": "Company Name",
+            "type": "string"
+          },
+          "email_validity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Validity"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "first_name": {
+            "default": "",
+            "title": "First Name",
+            "type": "string"
+          },
+          "found_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found Email"
+          },
+          "full_name": {
+            "default": "",
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_name": {
+            "default": "",
+            "title": "Last Name",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "EmailFinderProspectOut",
+        "type": "object"
+      },
+      "EmailFinderTrialOut": {
+        "description": "Trial / Bubble-compat response shape (no prospect wrapper).",
+        "properties": {
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          },
+          "validation": {
+            "default": "",
+            "title": "Validation",
+            "type": "string"
+          }
+        },
+        "title": "EmailFinderTrialOut",
+        "type": "object"
+      },
+      "EmailValidationIn": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "EmailValidationIn",
+        "type": "object"
+      },
+      "EmailValidationJobAcceptedOut": {
+        "description": "POST response — accepted-and-queued. HTTP 202.\nMatches legacy ``email_finder.py:457-461``.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "message": {
+            "default": "Email validation job created and processing has begun",
+            "title": "Message",
+            "type": "string"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "EmailValidationJobAcceptedOut",
+        "type": "object"
+      },
+      "EmailValidationJobIn": {
+        "description": "Bulk email-validation request. Same shape as the finder job\nminus the name/company fields. Matches legacy\n``EmailValidationJobSerializer``.",
+        "properties": {
+          "job_name": {
+            "default": "",
+            "title": "Job Name",
+            "type": "string"
+          },
+          "prospects": {
+            "items": {
+              "$ref": "#/components/schemas/EmailValidationProspectIn"
+            },
+            "title": "Prospects",
+            "type": "array"
+          },
+          "webhook_url": {
+            "default": "",
+            "title": "Webhook Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prospects"
+        ],
+        "title": "EmailValidationJobIn",
+        "type": "object"
+      },
+      "EmailValidationJobInProgressOut": {
+        "description": "GET response while job is pending or running. HTTP 202 +\nlimited fields, matches legacy.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EmailValidationJobInProgressOut",
+        "type": "object"
+      },
+      "EmailValidationJobOut": {
+        "description": "Bulk job response (completed). ``id`` is the bubble_job_id.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_message": {
+            "default": "",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "job_type": {
+            "default": "email_validation",
+            "title": "Job Type",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "prospects": {
+            "items": {
+              "$ref": "#/components/schemas/EmailValidationJobProspectOut"
+            },
+            "title": "Prospects",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at",
+          "updated_at",
+          "prospects"
+        ],
+        "title": "EmailValidationJobOut",
+        "type": "object"
+      },
+      "EmailValidationJobProspectOut": {
+        "properties": {
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          },
+          "email_validity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Validity"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "EmailValidationJobProspectOut",
+        "type": "object"
+      },
+      "EmailValidationOut": {
+        "description": "Single email-validation response (matches old SingleEmailValidationCreateView).",
+        "properties": {
+          "job_id": {
+            "default": "",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "prospect": {
+            "$ref": "#/components/schemas/EmailValidationProspectOut"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "prospect"
+        ],
+        "title": "EmailValidationOut",
+        "type": "object"
+      },
+      "EmailValidationProspectIn": {
+        "description": "One prospect inside a bulk email-validation job — just the\naddress. Matches legacy ``EmailValidationProspectSerializer``.",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "EmailValidationProspectIn",
+        "type": "object"
+      },
+      "EmailValidationProspectOut": {
+        "properties": {
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          },
+          "email_validity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Validity"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "EmailValidationProspectOut",
+        "type": "object"
+      },
+      "EmailValidationTrialOut": {
+        "description": "Trial / Bubble-compat response shape.",
+        "properties": {
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "EmailValidationTrialOut",
+        "type": "object"
+      },
+      "ExtractionCreateOut": {
+        "description": "202 Accepted response for URL + profile-list extractions.\n\nOld wire shape uses ``extraction_id`` (not ``search_id``) on POSTs;\nGET endpoints continue to expose the same value as ``search_id``.\nSee evaboot_django/public_api/views/extraction.py:506 (URL),\nline 867 (profile_ids/upload).",
+        "properties": {
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "extraction_id": {
+            "title": "Extraction Id",
+            "type": "string"
+          },
+          "message": {
+            "default": "",
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "extraction_id"
+        ],
+        "title": "ExtractionCreateOut",
+        "type": "object"
+      },
+      "ExtractionDetailOut": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "extraction_type": {
+            "default": "",
+            "title": "Extraction Type",
+            "type": "string"
+          },
+          "failure_reason": {
+            "default": "",
+            "title": "Failure Reason",
+            "type": "string"
+          },
+          "has_more": {
+            "default": false,
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "prospects": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Prospects",
+            "type": "array"
+          },
+          "returned_count": {
+            "default": 0,
+            "title": "Returned Count",
+            "type": "integer"
+          },
+          "search_id": {
+            "title": "Search Id",
+            "type": "string"
+          },
+          "search_name": {
+            "default": "",
+            "title": "Search Name",
+            "type": "string"
+          },
+          "start": {
+            "default": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          },
+          "total_count": {
+            "default": 0,
+            "title": "Total Count",
+            "type": "integer"
+          },
+          "total_prospects": {
+            "default": 0,
+            "title": "Total Prospects",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "search_id"
+        ],
+        "title": "ExtractionDetailOut",
+        "type": "object"
+      },
+      "ExtractionInProgressOut": {
+        "description": "202 response for in-progress extractions on detail GET.",
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "extraction_type": {
+            "default": "",
+            "title": "Extraction Type",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
+          },
+          "search_id": {
+            "title": "Search Id",
+            "type": "string"
+          },
+          "search_name": {
+            "default": "",
+            "title": "Search Name",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          },
+          "total_prospects": {
+            "default": 0,
+            "title": "Total Prospects",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "search_id"
+        ],
+        "title": "ExtractionInProgressOut",
+        "type": "object"
+      },
+      "ExtractionListItemOut": {
+        "properties": {
+          "extraction_type": {
+            "default": "",
+            "title": "Extraction Type",
+            "type": "string"
+          },
+          "search_date_created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Date Created"
+          },
+          "search_id": {
+            "title": "Search Id",
+            "type": "string"
+          },
+          "search_name": {
+            "default": "",
+            "title": "Search Name",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          },
+          "total_prospects": {
+            "default": 0,
+            "title": "Total Prospects",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "search_id"
+        ],
+        "title": "ExtractionListItemOut",
+        "type": "object"
+      },
+      "JobOut": {
+        "properties": {
+          "error_message": {
+            "default": "",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "progress": {
+            "additionalProperties": true,
+            "title": "Progress",
+            "type": "object"
+          },
+          "result": {
+            "additionalProperties": true,
+            "title": "Result",
+            "type": "object"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "JobOut",
+        "type": "object"
+      },
+      "JobStartedOut": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "JobStartedOut",
+        "type": "object"
+      },
+      "LeadAddIn": {
+        "properties": {
+          "profile_urns": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 999,
+            "minItems": 1,
+            "title": "Profile Urns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "profile_urns"
+        ],
+        "title": "LeadAddIn",
+        "type": "object"
+      },
+      "ListCreateIn": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ListCreateIn",
+        "type": "object"
+      },
+      "ListCreateOut": {
+        "properties": {
+          "list_id": {
+            "title": "List Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "list_id",
+          "name"
+        ],
+        "title": "ListCreateOut",
+        "type": "object"
+      },
+      "PaginateIn": {
+        "properties": {
+          "count": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Count",
+            "type": "integer"
+          },
+          "query": {
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "start": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "PaginateIn",
+        "type": "object"
+      },
+      "ProfileExtractionCreateIn": {
+        "properties": {
+          "enrich_email": {
+            "default": "none",
+            "enum": [
+              "none",
+              "matching",
+              "all"
+            ],
+            "title": "Enrich Email",
+            "type": "string"
+          },
+          "profile_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2500,
+            "minItems": 1,
+            "title": "Profile Ids",
+            "type": "array"
+          },
+          "search_name": {
+            "maxLength": 255,
+            "title": "Search Name",
+            "type": "string"
+          },
+          "webhook_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Url"
+          }
+        },
+        "required": [
+          "profile_ids",
+          "search_name"
+        ],
+        "title": "ProfileExtractionCreateIn",
+        "type": "object"
+      },
+      "QuotaInfo": {
+        "properties": {
+          "credits": {
+            "default": 0.0,
+            "title": "Credits",
+            "type": "number"
+          },
+          "daily_limit": {
+            "default": 0,
+            "title": "Daily Limit",
+            "type": "integer"
+          },
+          "has_valid_salesnav": {
+            "default": false,
+            "title": "Has Valid Salesnav",
+            "type": "boolean"
+          },
+          "remaining": {
+            "default": 0,
+            "title": "Remaining",
+            "type": "integer"
+          },
+          "salesnavs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SalesNavInfo"
+            },
+            "title": "Salesnavs",
+            "type": "array"
+          },
+          "used_today": {
+            "default": 0,
+            "title": "Used Today",
+            "type": "integer"
+          }
+        },
+        "title": "QuotaInfo",
+        "type": "object"
+      },
+      "QuotaOut": {
+        "properties": {
+          "quota": {
+            "$ref": "#/components/schemas/QuotaInfo"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "quota"
+        ],
+        "title": "QuotaOut",
+        "type": "object"
+      },
+      "RawOut": {
+        "description": "A LinkedIn payload passed through unchanged.",
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "RawOut",
+        "type": "object"
+      },
+      "SalesNavInfo": {
+        "properties": {
+          "daily_limit": {
+            "default": 0,
+            "title": "Daily Limit",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "remaining": {
+            "default": 0,
+            "title": "Remaining",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "used_today": {
+            "default": 0,
+            "title": "Used Today",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "SalesNavInfo",
+        "type": "object"
+      },
+      "SavedSearchCreateIn": {
+        "properties": {
+          "filters": {
+            "additionalProperties": true,
+            "title": "Filters",
+            "type": "object"
+          },
+          "frequency": {
+            "default": "DAILY",
+            "enum": [
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "keywords": {
+            "default": "",
+            "title": "Keywords",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "search_type": {
+            "enum": [
+              "lead",
+              "account"
+            ],
+            "title": "Search Type",
+            "type": "string"
+          },
+          "seat": {
+            "default": "",
+            "title": "Seat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "search_type"
+        ],
+        "title": "SavedSearchCreateIn",
+        "type": "object"
+      },
+      "SearchAgentIn": {
+        "properties": {
+          "conversation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "message": {
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "SearchAgentIn",
+        "type": "object"
+      },
+      "SearchAgentJobOut": {
+        "properties": {
+          "error_message": {
+            "default": "",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "progress": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Progress",
+            "type": "object"
+          },
+          "result": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Result",
+            "type": "object"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "SearchAgentJobOut",
+        "type": "object"
+      },
+      "SearchAgentOut": {
+        "properties": {
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "filters_used": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Filters Used",
+            "type": "object"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "reply": {
+            "default": "",
+            "title": "Reply",
+            "type": "string"
+          },
+          "result_count": {
+            "default": 0,
+            "title": "Result Count",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strategy"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "conversation_id"
+        ],
+        "title": "SearchAgentOut",
+        "type": "object"
+      },
+      "SearchBuilderIn": {
+        "properties": {
+          "description": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "search_type": {
+            "default": "LEAD",
+            "enum": [
+              "LEAD",
+              "ACCOUNT"
+            ],
+            "title": "Search Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "SearchBuilderIn",
+        "type": "object"
+      },
+      "SearchBuilderOut": {
+        "properties": {
+          "filters_used": {
+            "additionalProperties": true,
+            "title": "Filters Used",
+            "type": "object"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "filters_used"
+        ],
+        "title": "SearchBuilderOut",
+        "type": "object"
+      },
+      "SearchToListIn": {
+        "properties": {
+          "list_name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "List Name",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 1000,
+            "maximum": 1000,
+            "minimum": 1,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "search_url": {
+            "minLength": 1,
+            "title": "Search Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "search_url",
+          "list_name"
+        ],
+        "title": "SearchToListIn",
+        "type": "object"
+      },
+      "SingleExtractionCreateIn": {
+        "properties": {
+          "enrich_email": {
+            "default": "none",
+            "enum": [
+              "none",
+              "matching",
+              "all"
+            ],
+            "title": "Enrich Email",
+            "type": "string"
+          },
+          "profile_id": {
+            "title": "Profile Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile_id"
+        ],
+        "title": "SingleExtractionCreateIn",
+        "type": "object"
+      },
+      "SingleExtractionOut": {
+        "description": "200 OK response for single-profile extraction.\n\nLike the other POST endpoints, the legacy wire format uses\n``extraction_id`` rather than ``search_id``. See\nevaboot_django/public_api/views/extraction.py:1350.",
+        "properties": {
+          "extraction_id": {
+            "title": "Extraction Id",
+            "type": "string"
+          },
+          "prospect": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Prospect",
+            "type": "object"
+          },
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "extraction_id"
+        ],
+        "title": "SingleExtractionOut",
+        "type": "object"
+      },
+      "UrlExtractionCreateIn": {
+        "properties": {
+          "enrich_email": {
+            "default": "none",
+            "enum": [
+              "none",
+              "matching",
+              "all"
+            ],
+            "title": "Enrich Email",
+            "type": "string"
+          },
+          "linkedin_url": {
+            "title": "Linkedin Url",
+            "type": "string"
+          },
+          "search_name": {
+            "maxLength": 255,
+            "title": "Search Name",
+            "type": "string"
+          },
+          "webhook_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Url"
+          }
+        },
+        "required": [
+          "linkedin_url",
+          "search_name"
+        ],
+        "title": "UrlExtractionCreateIn",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "PublicBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "",
+    "title": "Evaboot API",
+    "version": "1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/trial/email-finder/": {
+      "post": {
+        "operationId": "apps_public_api_routers_trial_trial_email_finder",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailFinderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFinderTrialOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Trial Email Finder",
+        "tags": [
+          "trial"
+        ]
+      }
+    },
+    "/trial/email-validation/": {
+      "post": {
+        "operationId": "apps_public_api_routers_trial_trial_email_validation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailValidationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidationTrialOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Trial Email Validation",
+        "tags": [
+          "trial"
+        ]
+      }
+    },
+    "/v1/email-finder/": {
+      "get": {
+        "description": "List email-finder jobs created by the authenticated user.",
+        "operationId": "apps_public_api_routers_email_finder_email_finder_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EmailFinderJobOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Finder List",
+        "tags": [
+          "email-finder"
+        ]
+      },
+      "post": {
+        "description": "Create a bulk email-finder job. Returns ``202`` + ``job_id``.\nWorker enriches each prospect asynchronously; clients poll\n``GET /v1/email-finder/{job_id}/`` for results.",
+        "operationId": "apps_public_api_routers_email_finder_email_finder_bulk",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailFinderJobIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFinderJobAcceptedOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Finder Bulk",
+        "tags": [
+          "email-finder"
+        ]
+      }
+    },
+    "/v1/email-finder/single/": {
+      "post": {
+        "description": "Find an email for a single prospect inline. Runs the lookup and\nreturns the full prospect payload; ``job_id`` is a local tracking id.",
+        "operationId": "apps_public_api_routers_email_finder_email_finder_single",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailFinderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFinderOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Finder Single",
+        "tags": [
+          "email-finder"
+        ]
+      }
+    },
+    "/v1/email-finder/{job_id}/": {
+      "get": {
+        "description": "Retrieve a single email-finder job. ``job_id`` is the Bubble-minted\nstring id returned from POST. While the job is pending/running we\nreturn 202 + limited fields; once complete we return 200 + full\nprospect list. Same split as the legacy DRF retrieve view.",
+        "operationId": "apps_public_api_routers_email_finder_email_finder_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFinderJobOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFinderJobInProgressOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Finder Retrieve",
+        "tags": [
+          "email-finder"
+        ]
+      }
+    },
+    "/v1/email-validation/": {
+      "get": {
+        "description": "List email-validation jobs created by the authenticated user.",
+        "operationId": "apps_public_api_routers_email_validation_email_validation_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EmailValidationJobOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Validation List",
+        "tags": [
+          "email-validation"
+        ]
+      },
+      "post": {
+        "description": "Create a bulk email-validation job. Returns ``202`` + ``job_id``.\nWorker validates each prospect asynchronously; clients poll\n``GET /v1/email-validation/{job_id}/`` for results.",
+        "operationId": "apps_public_api_routers_email_validation_email_validation_bulk",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailValidationJobIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidationJobAcceptedOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Validation Bulk",
+        "tags": [
+          "email-validation"
+        ]
+      }
+    },
+    "/v1/email-validation/single/": {
+      "post": {
+        "description": "Validate a single email address inline. Runs the validation and\nreturns the prospect payload; ``job_id`` is a local tracking id.",
+        "operationId": "apps_public_api_routers_email_validation_email_validation_single",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailValidationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Validation Single",
+        "tags": [
+          "email-validation"
+        ]
+      }
+    },
+    "/v1/email-validation/{job_id}/": {
+      "get": {
+        "description": "Retrieve a single email-validation job. ``job_id`` is the\nBubble-minted string id returned from POST. While the job is\npending/running we return 202 + limited fields; once complete we\nreturn 200 + full prospect list.",
+        "operationId": "apps_public_api_routers_email_validation_email_validation_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidationJobOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidationJobInProgressOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Email Validation Retrieve",
+        "tags": [
+          "email-validation"
+        ]
+      }
+    },
+    "/v1/extractions/": {
+      "get": {
+        "description": "List extractions for the authenticated user.",
+        "operationId": "apps_public_api_routers_extractions_extraction_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExtractionListItemOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Extraction List",
+        "tags": [
+          "extractions"
+        ]
+      }
+    },
+    "/v1/extractions/profiles/": {
+      "post": {
+        "description": "Create a multi-profile extraction from URL list.",
+        "operationId": "apps_public_api_routers_extractions_profile_extraction_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileExtractionCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionCreateOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Profile Extraction Create",
+        "tags": [
+          "extractions"
+        ]
+      }
+    },
+    "/v1/extractions/single/": {
+      "post": {
+        "description": "Create a single-profile extraction.\n\nRuns the scrape pipeline inline (not via Dramatiq) so we can return\nthe serialized prospect in the response, matching the legacy\nsynchronous behavior at\nevaboot_django/public_api/views/extraction.py:1268.",
+        "operationId": "apps_public_api_routers_extractions_single_profile_extraction_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SingleExtractionCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleExtractionOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Single Profile Extraction Create",
+        "tags": [
+          "extractions"
+        ]
+      }
+    },
+    "/v1/extractions/url/": {
+      "post": {
+        "description": "Create a URL-based extraction.\n\nThe URL is probed against LinkedIn synchronously before any export\nrow or Bubble side-effect is created: a query LinkedIn rejects\n(400) surfaces as a 422 to the caller, not as an export that fails\n30 s later in the worker. Mirrors the extension launcher.",
+        "operationId": "apps_public_api_routers_extractions_url_extraction_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UrlExtractionCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionCreateOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Url Extraction Create",
+        "tags": [
+          "extractions"
+        ]
+      }
+    },
+    "/v1/extractions/{extraction_id}/": {
+      "get": {
+        "description": "Get extraction details by search_id (bubble_id).\n\nReturns 202 + minimal payload for in-progress extractions, 200 + full\npayload for completed ones. ``progress`` reports a real percentage —\npagination weighted as the first 75%, parallel scrape as the last\n25% — published by the worker to the cache (see\n``apps/sales_nav_exports/services/progress.py``). Falls back to 0\nwhen the cache has no entry (legacy exports, dummy cache in tests).\n\nProspect pagination is opt-in: with ``limit`` omitted the full\n``prospects`` array is returned (unchanged). With ``limit`` set only\nthe ``[start:start+limit]`` page is fetched, and ``total_count`` /\n``has_more`` describe the full result set.",
+        "operationId": "apps_public_api_routers_extractions_extraction_detail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "extraction_id",
+            "required": true,
+            "schema": {
+              "title": "Extraction Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionDetailOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionInProgressOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Extraction Detail",
+        "tags": [
+          "extractions"
+        ]
+      }
+    },
+    "/v1/quota/": {
+      "get": {
+        "description": "Quota + credit information.\n\nQuota is per SalesNav seat (``LinkedInAccount.daily_export_limit``,\ndefault 2500); usage counts profiles each seat launched in the last\n24h. Top-level numbers aggregate the user's valid seats; per-seat\ndetail rides in ``salesnavs``. Without a valid SalesNav account\n``remaining`` is 0. Credits come from Django for migrated users,\nBubble otherwise (best-effort, ``0.0`` when Bubble is unreachable).",
+        "operationId": "apps_public_api_routers_quota_get_quota",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Get Quota",
+        "tags": [
+          "quota"
+        ]
+      }
+    },
+    "/v1/search-agent/": {
+      "post": {
+        "description": "Turn a natural-language request into a Sales Navigator search.\n\nEnforced in order: the daily limit (protects the customer's own LinkedIn\nseat from sustained automation — checked before any agent work, not\nafter), then the Sales Navigator account requirement (same gate every\nother extraction endpoint applies).\n\nThe daily limit meters **every** turn, not just the ones that go\ncompany-first: a cheap lead-build refinement costs the same unit as a\nmulti-round company crawl, and a turn that 502s is charged too, since the\nincrement happens before the agent runs. That is deliberate — every turn\nis an Opus call plus typeahead traffic on the customer's own seat, and the\ncounter must not be refundable by failing on purpose. The practical\nconsequence is that 20 refinements or 20 errored turns exhaust the day's\ncompany-first budget.",
+        "operationId": "apps_public_api_routers_search_agent_search_agent",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchAgentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchAgentOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Search Agent",
+        "tags": [
+          "search-agent"
+        ]
+      }
+    },
+    "/v1/search-agent/jobs/{job_id}": {
+      "get": {
+        "description": "Poll a company-first search job. Returns 404 for another user's job.\n\nDeliberately NOT rate-limited by ``DAILY_LIMIT``: a company-first\njob runs for minutes and the client polls it every few seconds, so\ncharging the 20/day agent quota per poll would make polling impossible.\nThe quota only guards the expensive/automatable POST that starts work.",
+        "operationId": "apps_public_api_routers_search_agent_search_agent_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchAgentJobOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Search Agent Job",
+        "tags": [
+          "search-agent"
+        ]
+      }
+    },
+    "/v1/search-builder/": {
+      "post": {
+        "description": "Generate a Sales Navigator URL from a natural-language description.\n\nFree of charge — no credit deduction. Capped at\n``SEARCH_BUILDER_DAILY_LIMIT`` calls/day per user (legacy parity).\nLLM failures surface as ``GenerationError`` → 400.",
+        "operationId": "apps_public_api_routers_search_builder_search_builder",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchBuilderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchBuilderOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Search Builder",
+        "tags": [
+          "search-builder"
+        ]
+      }
+    },
+    "/v1/sn/account-lists": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_account_lists_index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Count",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Account Lists Index",
+        "tags": [
+          "sales-navigator"
+        ]
+      },
+      "post": {
+        "operationId": "apps_public_api_routers_sn_account_list_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCreateOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Account List Create",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/account-lists/from-search": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_account_list_from_search",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchToListIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStartedOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Account List From Search",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/account-lists/{list_id}": {
+      "delete": {
+        "operationId": "apps_public_api_routers_sn_account_list_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Account List Delete",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/account-lists/{list_id}/accounts": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_account_list_add",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountAddIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Account List Add",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_all",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts All",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/account-list/{list_id}": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_from_account_list",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts From Account List",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/accounts": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_accounts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts Accounts",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/company/{company_id}": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_for_company",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts For Company",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/lead-list/{list_id}": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_from_lead_list",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts From Lead List",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/lead/{profile_urn}": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_for_lead",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_urn",
+            "required": true,
+            "schema": {
+              "title": "Profile Urn",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts For Lead",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/alerts/leads": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_alerts_leads",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "formatted",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Formatted",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Alerts Leads",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/jobs/{job_id}": {
+      "get": {
+        "description": "Poll a search-to-list job.\n\nTenant-scoped through ``get_for_user``: another customer's job is a 404, not\na 403, so the endpoint never confirms that an id exists.\n\nDeliberately NOT metered by ``SN_SEARCH_TO_LIST_DAILY_LIMIT``: a job runs\nfor minutes and the client polls it every few seconds, so charging the\nlaunch quota per poll would make polling impossible. The quota guards the\nPOSTs that start real work.",
+        "operationId": "apps_public_api_routers_sn_sn_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Sn Job",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/lead-lists": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_lead_lists_index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Count",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Lead Lists Index",
+        "tags": [
+          "sales-navigator"
+        ]
+      },
+      "post": {
+        "operationId": "apps_public_api_routers_sn_lead_list_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCreateOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Lead List Create",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/lead-lists/from-search": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_lead_list_from_search",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchToListIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStartedOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Lead List From Search",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/lead-lists/{list_id}": {
+      "delete": {
+        "operationId": "apps_public_api_routers_sn_lead_list_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Lead List Delete",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/lead-lists/{list_id}/leads": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_lead_list_add",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "list_id",
+            "required": true,
+            "schema": {
+              "title": "List Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadAddIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Lead List Add",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/saved-searches": {
+      "get": {
+        "operationId": "apps_public_api_routers_sn_saved_searches_index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search_type",
+            "required": false,
+            "schema": {
+              "default": "lead",
+              "enum": [
+                "lead",
+                "account"
+              ],
+              "title": "Search Type",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Start",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Count",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Saved Searches Index",
+        "tags": [
+          "sales-navigator"
+        ]
+      },
+      "post": {
+        "operationId": "apps_public_api_routers_sn_saved_search_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedSearchCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Saved Search Create",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/saved-searches/{search_id}": {
+      "delete": {
+        "operationId": "apps_public_api_routers_sn_saved_search_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "search_id",
+            "required": true,
+            "schema": {
+              "title": "Search Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seat",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Seat",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Saved Search Delete",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/search/accounts": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_search_accounts",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaginateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Search Accounts",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    },
+    "/v1/sn/search/leads": {
+      "post": {
+        "operationId": "apps_public_api_routers_sn_search_leads",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaginateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "PublicBearer": []
+          }
+        ],
+        "summary": "Search Leads",
+        "tags": [
+          "sales-navigator"
+        ]
+      }
+    }
+  },
+  "servers": []
+}

@@ -31,7 +31,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.12", "3.13"]
+        # 3.12 is the floor declared in pyproject; 3.14 is what the maintainer
+        # runs by default, so leaving it out meant the most-used version was the
+        # one version never tested.
+        python: ["3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

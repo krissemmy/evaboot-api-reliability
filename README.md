@@ -25,8 +25,9 @@ Evaboot's OpenAPI document is public and unauthenticated at `https://api.evaboot
 With [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv venv && uv pip install -e ".[dev]"
+uv sync --extra dev
 uv run evaboot-probe check
+uv run pytest -q
 ```
 
 Or with the stdlib toolchain, if you would rather not install anything extra:

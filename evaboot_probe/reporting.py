@@ -7,6 +7,8 @@ stay in sync, and so exit codes are derived from one place.
 from __future__ import annotations
 
 import json
+import os
+import sys
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -23,6 +25,37 @@ class Level(StrEnum):
     INFO = "INFO"
     POTENTIALLY_BREAKING = "POTENTIALLY BREAKING"
     BREAKING = "BREAKING"
+
+
+# Every status value is four characters wide, so the left column aligns without
+# padding, and colour codes never disturb it.
+_STATUS_COLOR = {
+    Status.PASS: "\033[32m",
+    Status.FAIL: "\033[1;31m",
+    Status.WARN: "\033[33m",
+    Status.INFO: "\033[2m",
+    Status.SKIP: "\033[2m",
+}
+_LEVEL_COLOR = {
+    Level.BREAKING: "\033[1;31m",
+    Level.POTENTIALLY_BREAKING: "\033[33m",
+    Level.INFO: "\033[2m",
+}
+_RESET = "\033[0m"
+
+
+def use_color(stream=None) -> bool:
+    """Colour only when a human is watching. Honours NO_COLOR and FORCE_COLOR."""
+    if os.environ.get("NO_COLOR"):
+        return False
+    if os.environ.get("FORCE_COLOR"):
+        return True
+    stream = stream or sys.stdout
+    return bool(getattr(stream, "isatty", lambda: False)())
+
+
+def _paint(text: str, code: str | None, color: bool) -> str:
+    return f"{code}{text}{_RESET}" if color and code else text
 
 
 @dataclass
@@ -72,7 +105,32 @@ def report_to_dict(report: Report) -> dict:
     }
 
 
-def render_report(report: Report, fmt: str) -> str:
+def _counts(report: Report) -> str:
+    labels = (
+        (Status.FAIL, "failed"),
+        (Status.PASS, "passed"),
+        (Status.WARN, "warnings"),
+        (Status.INFO, "info"),
+        (Status.SKIP, "skipped"),
+    )
+    parts = []
+    for status, label in labels:
+        count = sum(1 for check in report.checks if check.status is status)
+        if count:
+            parts.append(f"{count} {label}")
+    return ", ".join(parts)
+
+
+def _request_time(report: Report) -> str:
+    total_ms = sum(check.latency_ms or 0 for check in report.checks)
+    if not total_ms:
+        return ""
+    if total_ms >= 1000:
+        return f"{total_ms / 1000:.1f} s in requests"
+    return f"{total_ms} ms in requests"
+
+
+def render_report(report: Report, fmt: str, color: bool | None = None) -> str:
     if fmt == "json":
         return json.dumps(report_to_dict(report), indent=2)
     if fmt == "markdown":
@@ -80,7 +138,7 @@ def render_report(report: Report, fmt: str) -> str:
             "## Evaboot API reliability check",
             "",
             f"Target: `{report.target}`  ",
-            f"Overall: **{report.overall}**",
+            f"Overall: **{report.overall}** ({_counts(report)})",
             "",
             "| Check | Status | Latency | Detail |",
             "| --- | --- | --- | --- |",
@@ -90,22 +148,25 @@ def render_report(report: Report, fmt: str) -> str:
             lines.append(f"| `{c.name}` | {c.status} | {latency} | {c.detail} |")
         return "\n".join(lines)
 
+    color = use_color() if color is None else color
     width = max((len(c.name) for c in report.checks), default=0)
     lines = ["Evaboot API reliability check", f"target  {report.target}", ""]
-    for c in report.checks:
-        parts = [f"  {c.name:<{width}}  {c.status:<4}"]
-        if c.latency_ms is not None:
-            parts.append(f"{c.latency_ms:>5} ms")
-        if c.attempts > 1:
-            parts.append(f"attempts={c.attempts}")
-        lines.append("  ".join(parts))
-        if c.detail:
-            lines.append(f"  {'':<{width}}  {c.detail}")
-    lines += ["", f"overall {report.overall}"]
+    for check in report.checks:
+        latency = f"{check.latency_ms} ms" if check.latency_ms is not None else ""
+        attempts = f"  {check.attempts} attempts" if check.attempts > 1 else ""
+        status = _paint(str(check.status), _STATUS_COLOR.get(check.status), color)
+        lines.append(f"  {status}  {check.name:<{width}}  {latency:>8}{attempts}".rstrip())
+        if check.detail:
+            lines.append(f"        {check.detail}")
+
+    overall = _paint(str(report.overall), _STATUS_COLOR.get(report.overall), color)
+    footer = f"  {overall}  overall   {_counts(report)}"
+    request_time = _request_time(report)
+    lines += ["", f"{footer}   ({request_time})" if request_time else footer]
     return "\n".join(lines)
 
 
-def render_changes(changes: list[Change], fmt: str) -> str:
+def render_changes(changes: list[Change], fmt: str, color: bool | None = None) -> str:
     if fmt == "json":
         return json.dumps(
             {
@@ -135,12 +196,13 @@ def render_changes(changes: list[Change], fmt: str) -> str:
                 lines.append("")
         return "\n".join(lines).rstrip()
 
+    color = use_color() if color is None else color
     lines = []
     for level in order:
         group = [c for c in changes if c.level is level]
         if not group:
             continue
-        lines.append(f"{level} ({len(group)})")
+        lines.append(_paint(f"{level} ({len(group)})", _LEVEL_COLOR.get(level), color))
         for c in group:
             lines.append(f"  {c.target}")
             lines.append(f"    {c.detail}")

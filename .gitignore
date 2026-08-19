@@ -4,6 +4,9 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+# Not committed on purpose: two loosely pinned runtime dependencies, and CI
+# resolves fresh so an upstream httpx/jsonschema break surfaces here early.
+uv.lock
 dist/
 build/
 schemas/openapi.current.json

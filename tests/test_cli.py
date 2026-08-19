@@ -32,7 +32,9 @@ def write_spec(path, spec) -> str:
 def test_check_passing_run_exits_zero(monkeypatch, capsys):
     patch_transport(monkeypatch, make_transport(evaboot_routes()))
     assert cli.main(["check"]) == 0
-    assert "overall PASS" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "PASS  overall" in out
+    assert "passed" in out
 
 
 def test_check_failing_run_exits_one(monkeypatch, capsys):

@@ -68,6 +68,10 @@ Validates a payload against the documented response schemas — `EmailFinderJobO
 
 Shape detection uses documented discriminators only (`job_type`, `search_id`, presence of `prospects`). A payload carrying `prospects` is judged against the completed schema and never falls back to the in-progress one, because the in-progress schema is a strict subset: "whichever schema produces fewest errors" would grade a malformed completed payload as a valid in-progress one.
 
+### Output
+
+`--format text` prints one row per check with the status in a fixed left column, the measured latency, the attempt count when a request was retried, and a footer with status counts and total request time. The status column is coloured when stdout is a terminal; `NO_COLOR=1` turns that off and `FORCE_COLOR=1` forces it on, which is what you want when piping into a pager. `--format json` and `--format markdown` are never coloured.
+
 ### Exit codes
 
 | Code | Meaning |

@@ -26,9 +26,9 @@ Evaboot's OpenAPI document declares only 200 and 202 responses. There is no docu
 [`.github/workflows/reliability.yml`](../.github/workflows/reliability.yml) has two jobs:
 
 - **tests** — ruff lint, ruff format check, and pytest on Python 3.12 and 3.13. Every HTTP call is mocked, so this job passes whether or not Evaboot is up, and needs no secrets.
-- **live probe** — fetches the current spec, diffs it against the committed baseline, runs the credential-free checks, validates the example webhook payload, and uploads the JSON report plus the fetched spec as artifacts. A breaking contract change fails the job.
+- **live probe** — skipped on push, so the only triggers that reach Evaboot are pull requests, manual dispatch and the weekly schedule. It fetches the current spec, diffs it against the committed baseline, runs the credential-free checks, validates the example webhook payload, and uploads the JSON report plus the fetched spec as artifacts. A breaking contract change fails the job.
 
-`--include-trial` (the only POST) runs on `workflow_dispatch` and `schedule` only, never on push or pull request. The authenticated step is gated on an `EVABOOT_API_KEY` secret being configured and marked `continue-on-error`, so forks and outside contributors are unaffected. The default public CI passes with no secrets at all.
+`--include-trial` (the only POST) runs on `workflow_dispatch` and `schedule` only, never on a pull request. The authenticated step is gated on an `EVABOOT_API_KEY` secret being configured and marked `continue-on-error`, so forks and outside contributors are unaffected. The default public CI passes with no secrets at all.
 
 The schedule is weekly, not hourly. This watches for contract drift on an API we do not own; it is not an uptime monitor, and hammering a bootstrapped company's production API on a cron would be rude and would tell us nothing extra.
 

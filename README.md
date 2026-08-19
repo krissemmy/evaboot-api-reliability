@@ -62,7 +62,7 @@ evaboot-probe check
 
 Exit codes: `0` passed (WARN, INFO and SKIP do not fail a run), `1` a documented contract was violated or a diff hit `--fail-on`, `2` usage or configuration error, `3` target unreachable after retries. `3` is separate on purpose — "Evaboot is unreachable from this runner" and "Evaboot changed its response schema" are different incidents with different owners.
 
-Two runtime dependencies (`httpx`, `jsonschema`), Python 3.12+. CI runs lint, format and the offline test suite on every push, then a live probe that fails on a breaking contract change; see [.github/workflows/reliability.yml](.github/workflows/reliability.yml).
+Two runtime dependencies (`httpx`, `jsonschema`), Python 3.12+. CI runs lint, format and the offline test suite on every push. The live probe, which is the only part that sends requests to Evaboot, runs on pull requests, manual dispatch and a weekly schedule, and fails on a breaking contract change; see [.github/workflows/reliability.yml](.github/workflows/reliability.yml).
 
 ## Documentation
 

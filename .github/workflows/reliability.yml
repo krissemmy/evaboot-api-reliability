@@ -48,6 +48,12 @@ jobs:
   probe:
     name: live probe
     needs: test
+    # Never on push. Every run of this job sends real requests to Evaboot, and a
+    # merge to main has already been probed on its pull request. Pull requests,
+    # manual dispatch and the weekly schedule are the only triggers that talk to
+    # their API. The concurrency group above also cancels superseded runs, so
+    # pushing repeatedly to a PR branch does not stack up probe runs.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     env:
       # Evaluated once here so the step below can branch on it without putting

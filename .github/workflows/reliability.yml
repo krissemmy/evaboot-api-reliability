@@ -74,6 +74,15 @@ jobs:
         run: evaboot-probe schema fetch --out schemas/openapi.current.json
 
       - name: Diff against committed baseline
+        id: diff
+        # continue-on-error, not a hard failure here: a breaking change is a
+        # real finding this job exists to surface, not an infrastructure fault.
+        # Letting it stop the job here would skip the reliability checks and
+        # webhook validation below and bury the finding in a single failed
+        # step instead of a full report. The job still fails overall — see
+        # "Fail if the diff found blocking changes" at the end, once every
+        # other step has had a chance to run and report.
+        continue-on-error: true
         run: |
           echo "## Contract diff" >> "$GITHUB_STEP_SUMMARY"
           evaboot-probe schema diff \
@@ -119,3 +128,15 @@ jobs:
             report.json
             schemas/openapi.current.json
           if-no-files-found: warn
+
+      - name: Fail if the diff found blocking changes
+        # Placed last on purpose: every other step above has already run and
+        # published its findings (job summary, artifact) by the time this can
+        # fail the job. `outcome` reports the diff step's real result even
+        # though continue-on-error reported it as passed to the steps after it.
+        if: always()
+        run: |
+          if [ "${{ steps.diff.outcome }}" = "failure" ]; then
+            echo "::error::Contract diff found changes at or above --fail-on. See the 'Diff against committed baseline' step and job summary above."
+            exit 1
+          fi

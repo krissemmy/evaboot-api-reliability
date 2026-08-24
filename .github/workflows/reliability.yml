@@ -90,9 +90,16 @@ jobs:
             --format markdown | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Reliability checks
+        id: check
         # push/PR runs are GET-only. The opt-in POST to /trial/* happens on
         # manual and scheduled runs only. One invocation, so the live API is not
         # probed twice per run.
+        #
+        # continue-on-error, same reasoning as the diff step above: a failed
+        # check (e.g. a documented response schema disappearing) is a finding
+        # to report, not a reason to skip webhook validation and the
+        # authenticated check that follow. Gated at the end instead.
+        continue-on-error: true
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "schedule" ]; then
             TRIAL=--include-trial
@@ -108,6 +115,13 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Validate the example webhook payload
+        id: webhook
+        # Validates against the committed baseline, not the live fetch, so it
+        # is very unlikely to be caught up in same-day upstream drift. Still
+        # continue-on-error for the same reason as the two steps above: one
+        # finding must not suppress the authenticated check or the artifact
+        # upload that come after it.
+        continue-on-error: true
         run: evaboot-probe webhook validate docs/webhook-example.json
 
       - name: Authenticated checks
@@ -129,14 +143,30 @@ jobs:
             schemas/openapi.current.json
           if-no-files-found: warn
 
-      - name: Fail if the diff found blocking changes
-        # Placed last on purpose: every other step above has already run and
-        # published its findings (job summary, artifact) by the time this can
-        # fail the job. `outcome` reports the diff step's real result even
-        # though continue-on-error reported it as passed to the steps after it.
+      - name: Fail if any check found a real problem
+        # Placed last on purpose: the diff, the checks and the webhook
+        # validation all run with continue-on-error, so every one of them has
+        # already reported its findings (job summary, artifact) by the time
+        # this can fail the job. `outcome` reports each step's real result
+        # even though continue-on-error reported "success" to the steps after
+        # it. The authenticated step is deliberately excluded: a missing or
+        # rejected EVABOOT_API_KEY must not fail CI for forks and outside
+        # contributors, which is also why it stays continue-on-error above.
+        #
+        # GitHub Actions expressions (${{ }}) are expanded before the shell
+        # runs, and there is no dynamic `steps[name]` lookup, so each outcome
+        # is passed in by name via env rather than looped over.
         if: always()
+        env:
+          DIFF_OUTCOME: ${{ steps.diff.outcome }}
+          CHECK_OUTCOME: ${{ steps.check.outcome }}
+          WEBHOOK_OUTCOME: ${{ steps.webhook.outcome }}
         run: |
-          if [ "${{ steps.diff.outcome }}" = "failure" ]; then
-            echo "::error::Contract diff found changes at or above --fail-on. See the 'Diff against committed baseline' step and job summary above."
+          failed=""
+          [ "$DIFF_OUTCOME" = "failure" ] && failed="$failed diff"
+          [ "$CHECK_OUTCOME" = "failure" ] && failed="$failed check"
+          [ "$WEBHOOK_OUTCOME" = "failure" ] && failed="$failed webhook"
+          if [ -n "$failed" ]; then
+            echo "::error::Failing step(s):$failed. See their output and the job summary above."
             exit 1
           fi

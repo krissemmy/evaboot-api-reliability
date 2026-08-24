@@ -118,3 +118,23 @@ Three findings that matter for a client library:
 ## 9. Safety boundaries observed during research
 
 Total requests sent to Evaboot: 14 GETs (mostly 404 path probes) and 2 POSTs to `trial/email-validation/` — one with `{}`, one with `noreply@example.com` (RFC 2606 reserved domain, no MX, no real mailbox touched). No emails sent, no jobs created, no credits spent, no `DELETE` or `sn/*` endpoint touched.
+
+## Update, 2026-08-24: Evaboot shrank the public API
+
+The scheduled contract check caught a real change. `GET /openapi.json` now
+serves **13 paths, 30 schemas** (was 37 paths, 45 schemas on 2026-08-19),
+confirmed by three separate fetches rather than one possibly-transient
+response. Removed entirely: every `sn/*` operation (Sales Navigator lead
+lists, account lists, saved searches, alerts), `search-builder` was kept but
+`search-agent` was not, and both `trial/*` endpoints.
+
+The removed trial endpoint still answers `200` when called directly — it was
+pulled from the *documentation*, not from the running API — so it is now an
+undocumented endpoint this tool has no contract to check it against, and the
+`check` command correctly reports that as a failure rather than silently
+skipping it or crashing.
+
+The committed baseline was deliberately left unchanged pending a decision on
+whether to accept this as the new contract; updating it is a one-line
+`evaboot-probe schema fetch --out schemas/openapi.baseline.json`, done
+consciously rather than automatically overwritten by CI.

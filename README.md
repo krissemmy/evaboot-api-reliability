@@ -62,7 +62,24 @@ evaboot-probe check
 
 Exit codes: `0` passed (WARN, INFO and SKIP do not fail a run), `1` a documented contract was violated or a diff hit `--fail-on`, `2` usage or configuration error, `3` target unreachable after retries. `3` is separate on purpose — "Evaboot is unreachable from this runner" and "Evaboot changed its response schema" are different incidents with different owners.
 
-Two runtime dependencies (`httpx`, `jsonschema`), Python 3.12+. CI runs lint, format and the offline test suite on every push. The live probe, which is the only part that sends requests to Evaboot, runs on pull requests, manual dispatch and a weekly schedule, and fails on a breaking contract change; see [.github/workflows/reliability.yml](.github/workflows/reliability.yml).
+Two runtime dependencies (`httpx`, `jsonschema`), Python 3.12+.
+
+## CI
+
+[.github/workflows/reliability.yml](.github/workflows/reliability.yml) has two jobs:
+
+| Trigger | `test` (offline, mocked) | `live probe` (talks to Evaboot) |
+| --- | --- | --- |
+| `push` to `main` | runs | skipped |
+| `pull_request` | runs | runs — GET-only |
+| `workflow_dispatch` | runs | runs — includes the opt-in `/trial/*` POST |
+| `schedule` (weekly, Monday) | runs | runs — includes the opt-in `/trial/*` POST |
+
+`test` mocks every HTTP call, so it costs Evaboot nothing and runs on every push. `live probe` is the one job that sends real requests, so it is deliberately skipped on push: a merge to `main` was already probed on its pull request, and probing again on the same merge is repeat load for no new signal.
+
+**What a red `live probe` means.** `schema diff`, `check` and `webhook validate` each run with `continue-on-error`, so one of them failing never hides the others — every step publishes its findings to the job summary, and a final step decides pass/fail only once all three have reported. A red run means: open the job summary and read what changed or failed. It is either a real finding (Evaboot changed their contract, as happened on 2026-08-24 — see [docs/01-research-findings.md](docs/01-research-findings.md)) or a genuine outage, never something to fix by re-running the job. Details on why the job is wired this way are in [docs/04-design-notes.md](docs/04-design-notes.md).
+
+**Merging.** `main` requires a pull request with one approval; there is no required status check configured, so a passing `test`/`live probe` is a strong signal but not an enforced gate today. Read a red `live probe` on a PR before merging — it will not block the merge button by itself.
 
 ## Documentation
 
